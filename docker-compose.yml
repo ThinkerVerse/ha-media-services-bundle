@@ -1,0 +1,165 @@
+version: '3'
+services:
+
+############################
+# RADARR
+############################
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    network_mode: "service:gluetun"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TIMEZONE}
+    volumes:
+      - /data/radarr/config:/config
+      - /data/radarr/movies:/movies
+      - /data/qbittorrent/downloads:/downloads
+    restart: unless-stopped
+    
+############################
+# SONARR
+############################
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    network_mode: "service:gluetun"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TIMEZONE}
+    volumes:
+      - /data/sonarr/config:/config
+      - /data/sonarr/tvseries:/tv
+      - /data/qbittorrent/downloads:/downloads
+    restart: unless-stopped
+    
+############################
+# PROWLARR
+############################
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    network_mode: "service:gluetun"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TIMEZONE}
+    volumes:
+      - /data/prowlarr/config:/config
+    restart: unless-stopped
+
+############################
+# BAZARR
+############################
+
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    network_mode: "service:gluetun"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TIMEZONE}
+    volumes:
+      - /data/bazarr/config:/config
+      - /data/radarr/movies:/movies
+      - /data/sonarr/tvseries:/tv
+    restart: unless-stopped
+    
+############################
+# LIDARR
+############################
+
+  lidarr:
+    image: lscr.io/linuxserver/lidarr:latest
+    container_name: lidarr
+    network_mode: "service:gluetun"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TIMEZONE}
+    volumes:
+      - /data/lidarr/config:/config
+      - /data/lidarr/music:/music
+      - /data/qbittorrent/downloads:/downloads
+    restart: unless-stopped
+    
+############################
+# READARR
+############################
+
+  readarr:
+    image: lscr.io/linuxserver/readarr:develop
+    container_name: readarr
+    network_mode: "service:gluetun"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TIMEZONE}
+    volumes:
+      - /data/readarr/config:/config
+      - /data/readarr/books:/books
+      - /data/qbittorrent/downloads:/downloads
+    restart: unless-stopped
+    
+############################
+# QBITTORRENT		
+############################
+
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    network_mode: "service:gluetun"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TIMEZONE}
+      - WEBUI_PORT=8080
+      - TORRENTING_PORT=6881
+    volumes:
+      - /data/qbittorrent/config:/config
+      - /data/qbittorrent/downloads:/downloads
+    restart: unless-stopped
+    
+############################
+# JELLYFIN	
+############################
+
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TIMEZONE}
+    volumes:
+      - /data/jellyfin/config:/config
+      - /data/sonarr/tvseries:/data/tvshows
+      - /data/radarr/movies:/data/movies
+      - /data/lidarr/music:/data/music
+      - /data/readarr/books:/data/books
+    restart: unless-stopped
+    
+############################
+# GLUETUN
+############################
+
+  gluetun:
+    image: qmcgaw/gluetun
+    container_name: gluetun
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    environment:
+      - VPN_SERVICE_PROVIDER=${VPN_SERVICE_PROVIDER}
+      - VPN_TYPE=${VPN_TYPE}
+      - OPENVPN_USER=${VPN_USERNAME}
+      - OPENVPN_PASSWORD=${VPN_PASSWORD}
+      - SERVER_COUNTRIES=${VPN_SERVER_COUNTRIES}
+    restart: unless-stopped

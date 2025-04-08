@@ -1,0 +1,62 @@
+name: "Media Services Bundle"
+version: "1.0.0"
+slug: "media-services-bundle"
+description: "A collection of media services (Radarr, Sonarr, Prowlarr, Bazarr, Lidarr, Readarr, qBittorrent, Jellyfin) with VPN support via Gluetun"
+url: "https://github.com/ThinkerVerse/ha-media-services-bundle"
+arch:
+  - aarch64
+  - amd64
+  - armhf
+  - armv7
+  - i386
+startup: services
+boot: auto
+host_network: false
+ingress: true
+ingress_port: 8096
+panel_icon: mdi:play-network
+init: false
+hassio_api: true
+ports:
+  9696/tcp: 9696
+  7878/tcp: 7878
+  8989/tcp: 8989
+  6767/tcp: 6767
+  8686/tcp: 8686
+  8787/tcp: 8787
+  8080/tcp: 8080
+  6881/tcp: 6881
+  6881/udp: 6881
+  8096/tcp: 8096
+  8920/tcp: 8920
+  7359/udp: 7359
+  1900/udp: 1900
+ports_description:
+  9696/tcp: "Prowlarr WebUI"
+  7878/tcp: "Radarr WebUI"
+  8989/tcp: "Sonarr WebUI"
+  6767/tcp: "Bazarr WebUI"
+  8686/tcp: "Lidarr WebUI"
+  8787/tcp: "Readarr WebUI"
+  8080/tcp: "qBittorrent WebUI"
+  6881/tcp: "qBittorrent incoming connections"
+  6881/udp: "qBittorrent incoming connections UDP"
+  8096/tcp: "Jellyfin WebUI"
+  8920/tcp: "Jellyfin HTTPS"
+  7359/udp: "Jellyfin service discovery"
+  1900/udp: "Jellyfin service discovery"
+options:
+  vpn_service_provider: "nordvpn"
+  vpn_type: "openvpn"
+  vpn_username: ""
+  vpn_password: ""
+  vpn_server_countries: "Netherlands"
+  timezone: "Etc/UTC"
+schema:
+  vpn_service_provider: "str"
+  vpn_type: "list(openvpn|wireguard)"
+  vpn_username: "str"
+  vpn_password: "password"
+  vpn_server_countries: "str"
+  timezone: "str"
+image: "ghcr.io/thinkerverse/ha-media-services-bundle"

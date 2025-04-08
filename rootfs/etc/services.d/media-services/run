@@ -1,0 +1,34 @@
+#!/usr/bin/with-contenv bashio
+# ==============================================================================
+# Start the media services
+# ==============================================================================
+
+# Get config
+VPN_SERVICE_PROVIDER=$(bashio::config 'vpn_service_provider')
+VPN_TYPE=$(bashio::config 'vpn_type')
+VPN_USERNAME=$(bashio::config 'vpn_username')
+VPN_PASSWORD=$(bashio::config 'vpn_password')
+VPN_SERVER_COUNTRIES=$(bashio::config 'vpn_server_countries')
+TIMEZONE=$(bashio::config 'timezone')
+
+# Export variables for docker-compose
+export VPN_SERVICE_PROVIDER
+export VPN_TYPE
+export VPN_USERNAME
+export VPN_PASSWORD
+export VPN_SERVER_COUNTRIES
+export TIMEZONE
+
+# Create data directories if they don't exist
+mkdir -p /data/radarr/config /data/radarr/movies
+mkdir -p /data/sonarr/config /data/sonarr/tvseries
+mkdir -p /data/prowlarr/config
+mkdir -p /data/bazarr/config
+mkdir -p /data/lidarr/config /data/lidarr/music
+mkdir -p /data/readarr/config /data/readarr/books
+mkdir -p /data/qbittorrent/config /data/qbittorrent/downloads
+mkdir -p /data/jellyfin/config
+
+# Start services
+cd /etc
+docker-compose up

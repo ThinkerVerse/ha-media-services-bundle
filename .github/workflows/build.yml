@@ -1,0 +1,77 @@
+name: "Build Media Services Bundle"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  release:
+    types:
+      - published
+
+jobs:
+  build:
+    name: Build ${{ matrix.arch }} image
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: [aarch64, amd64, armhf, armv7, i386]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Login to GitHub Container Registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          platforms: linux/${{ matrix.arch }}
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ghcr.io/thinkerverse/ha-media-services-bundle:${{ matrix.arch }}
+          build-args: |
+            BUILD_FROM=homeassistant/${{ matrix.arch }}-base:latest
+
+  manifest:
+    name: Create and push manifest
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name != 'pull_request'
+    steps:
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create and push manifest
+        run: |
+          VERSION="${{ github.ref_name }}"
+          if [[ "$VERSION" == "main" ]]; then
+            VERSION="latest"
+          fi
+          
+          docker manifest create \
+            ghcr.io/thinkerverse/ha-media-services-bundle:$VERSION \
+            ghcr.io/thinkerverse/ha-media-services-bundle:aarch64 \
+            ghcr.io/thinkerverse/ha-media-services-bundle:amd64 \
+            ghcr.io/thinkerverse/ha-media-services-bundle:armhf \
+            ghcr.io/thinkerverse/ha-media-services-bundle:armv7 \
+            ghcr.io/thinkerverse/ha-media-services-bundle:i386
+          
+          docker manifest push ghcr.io/thinkerverse/ha-media-services-bundle:$VERSION
