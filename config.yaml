@@ -1,5 +1,5 @@
 name: "Media Services Bundle"
-version: "1.0.0"
+version: "1.0.1"
 slug: "media-services-bundle"
 description: "A collection of media services (Radarr, Sonarr, Prowlarr, Bazarr, Lidarr, Readarr, qBittorrent, Jellyfin) with VPN support via Gluetun"
 url: "https://github.com/ThinkerVerse/ha-media-services-bundle"
@@ -17,6 +17,7 @@ ingress_port: 8096
 panel_icon: mdi:play-network
 init: false
 hassio_api: true
+image: false # Set this to false to use local build
 ports:
   9696/tcp: 9696
   7878/tcp: 7878
@@ -59,4 +60,3 @@ schema:
   vpn_password: "password"
   vpn_server_countries: "str"
   timezone: "str"
-image: "ghcr.io/thinkerverse/ha-media-services-bundle"
